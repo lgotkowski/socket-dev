@@ -2,6 +2,10 @@ import json
 import struct
 
 
+class MessageTarget(object):
+    pass
+
+
 class MessageHandler(object):
     def __init__(self):
         self._message_buffer = b""
