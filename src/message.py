@@ -4,10 +4,12 @@ import struct
 
 class MessageHandler(object):
     def __init__(self):
-        self._message_buffer = ""
+        self._message_buffer = b""
         self._header_len = None
         self._header = None
         self._content = None
+
+        self._fixed_header_size = 2
 
     @staticmethod
     def pack_message(content):
@@ -28,27 +30,29 @@ class MessageHandler(object):
     @staticmethod
     def json_decode(content):
         return json.loads(content)
-        #return json.loads(content, encoding="uft-8")
 
-    def unpack_message(self, message_buffer):
+    def unpack_messages(self, message_buffer):
         self._message_buffer += message_buffer
 
-        if not self._header_len:
-            self._unpack_fixed_header()
-        if not self._header:
-            self._unpack_header()
-        if not self._content:
-            self._unpack_content()
-        else:
-            content = self._content
-            self._header_len = None
-            self._header = None
-            self._content = None
-            return content
-        return None
+        content = []
+
+        while len(self._message_buffer) > self._fixed_header_size:
+            if not self._header_len:
+                self._unpack_fixed_header()
+            if not self._header:
+                self._unpack_header()
+            if not self._content:
+                self._unpack_content()
+            if self._content:
+                content.append(self._content)
+                self._header_len = None
+                self._header = None
+                self._content = None
+        return content
 
     def _unpack_fixed_header(self):
         length = 2
+
         if len(self._message_buffer) >= length:
             self._header_len = struct.unpack(">H", self._message_buffer[:length])[0]
             self._message_buffer = self._message_buffer[length:]

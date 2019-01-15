@@ -11,8 +11,8 @@ class Server(object):
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self._socket.bind((host, port))
-        #self._socket.setblocking(False)
         self._socket.listen(5)
+        print("Starting server")
         while not self._stop_request:
             client, address = self._socket.accept()
             client.settimeout(60)
@@ -20,26 +20,28 @@ class Server(object):
         self._socket.close()
 
     def _listen_to_client(self, client, address):
+        print("Listen to Client")
         msg_handler = MessageHandler()
         size = 1024
         while not self._stop_request:
             try:
-                content = msg_handler.unpack_message(client.recv(size))
-                #content = client.recv(size)
-                if content:
-                    print "Msg recived: {}".format(content)
-                    response = content
-                    client.send(MessageHandler.pack_message(response))
-                    if content == "Goodbye":
-                        break
+                content_list = msg_handler.unpack_messages(client.recv(size))
+                if content_list:
+                    for content in content_list:
+                        print("Recived: {}".format(content))
+                        response = content
+                        client.send(MessageHandler.pack_message(response))
+                        if content == "Goodbye":
+                            self._stop_request = True
+                            break
                 else:
-                    print "Client disconnected?"
+                    print("Client disconnected?")
                     pass
             except Exception as error:
                 #raise error
                 pass
         client.close()
-        print "Stop listening to client"
+        print("Stop listening to client")
 
     def stop(self):
         self._stop_request = True
@@ -47,5 +49,5 @@ class Server(object):
 
 if __name__ == "__main__":
     server = Server()
-    server.start("127.0.0.1", 7777)
-    print "END"
+    server.start("127.0.0.1", 65432)
+    print("END")
