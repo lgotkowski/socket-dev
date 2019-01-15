@@ -2,6 +2,7 @@ import socket
 import threading
 import time
 from message import MessageHandler
+from event import Event
 
 
 class ClientStates():
@@ -12,6 +13,8 @@ class ClientStates():
 
 
 class Client(object):
+    on_message_recived = Event()
+
     def __init__(self):
         self._stop_request = False
         self._state = ClientStates.IDLE
@@ -30,14 +33,15 @@ class Client(object):
             print("- Client already running.")
             return
 
+        self._stop_request = False
         self._set_state(ClientStates.STARTING)
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._socket.connect((host, port))
         threading.Thread(target=self._listen_to_server).start()
 
-    def send_to_server(self, data):
+    def send_to_server(self, data, message_tag=None):
         #print("CLIENT Sent: {}".format(data))
-        msg = MessageHandler.pack_message(data)
+        msg = MessageHandler.pack_message(data, message_tag=message_tag)
         if not self.state == ClientStates.RUNNING:
             self._msg_queue.append(msg)
         else:
@@ -47,7 +51,7 @@ class Client(object):
 
     def _listen_to_server(self):
         self._set_state(ClientStates.RUNNING)
-        self.send_to_server("Hello Server")
+        #self.send_to_server("Hello Server")
         msg_handler = MessageHandler()
         size = 1024
         while not self._stop_request:
@@ -55,7 +59,7 @@ class Client(object):
                 content_list = msg_handler.unpack_messages(self._socket.recv(size))
                 if content_list:
                     for content in content_list:
-                        #print("CLIENT Recived Echo: {}".format(content))
+                        self.on_message_recived.emit(self, content)
                         if content == "Goodbye":
                             self._stop_request = True
                             break

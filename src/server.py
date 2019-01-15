@@ -1,6 +1,6 @@
 import socket
 import threading
-from message import MessageHandler
+from message import MessageHandler, MessageTags
 from event import Event
 
 
@@ -42,12 +42,11 @@ class Server(object):
                 content_list = msg_handler.unpack_messages(client.recv(size))
                 if content_list:
                     for content in content_list:
-                        print("SERVER Recived: {}".format(content))
                         self.on_message_recived.emit(self, content)
                         # ECHO PART
                         #response = content
                         #client.send(MessageHandler.pack_message(response))
-                        if content == "Goodbye":
+                        if content.get("message_tag") == MessageTags.STOP:
                             self._stop_request = True
                             break
                 else:

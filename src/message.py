@@ -2,8 +2,8 @@ import json
 import struct
 
 
-class MessageTarget(object):
-    pass
+class MessageTags(object):
+    STOP = "stop"
 
 
 class MessageHandler(object):
@@ -16,8 +16,9 @@ class MessageHandler(object):
         self._fixed_header_size = 2
 
     @staticmethod
-    def pack_message(content):
-        content_bytes = MessageHandler.json_encode(content)
+    def pack_message(content, message_tag=None):
+        content_dict = {"content": content, "message_tag": message_tag}
+        content_bytes = MessageHandler.json_encode(content_dict)
 
         header = {"content_length": len(content_bytes)}
         header_bytes = MessageHandler.json_encode(header)
