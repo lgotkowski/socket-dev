@@ -7,8 +7,11 @@ from event import Event
 
 class NetMessageTags(object):
     STOP = "stop"
-    CLIENT_DISCONNECT = "client_disconnect"
-    SERVER_DISCONNECT = "server_disconnect"
+
+
+class NetMessageKeys(object):
+    CONTENT = "content"
+    TAG = "tag"
 
 
 class NetMessageHandler(object):
@@ -22,7 +25,7 @@ class NetMessageHandler(object):
 
     @staticmethod
     def pack_message(content, message_tag=None):
-        content_dict = {"content": content, "message_tag": message_tag}
+        content_dict = {NetMessageKeys.CONTENT: content, NetMessageKeys.TAG: message_tag}
         content_bytes = NetMessageHandler.json_encode(content_dict)
 
         header = {"content_length": len(content_bytes)}

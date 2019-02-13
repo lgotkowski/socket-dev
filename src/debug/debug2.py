@@ -2,8 +2,8 @@ from network import NetServer, NetClient, NetMessageTags
 import time
 
 
-def listen_to_server(server, message):
-    print("New Msg: {}".format(message))
+def listen_to_server(server, message, socket):
+    print("New Msg: {} | socket: {}".format(message, socket))
 
 
 if __name__ == "__main__":

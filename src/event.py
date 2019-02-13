@@ -8,9 +8,9 @@ class Event(object):
     def remove(self, handler):
         self._handlers.remove(handler)
 
-    def emit(self, sender, event_args=None):
+    def emit(self, sender, args):
         for handler in self._handlers:
-            handler(sender, event_args)
+            handler(sender, args)
 
     def __iadd__(self, handler):
         self.add(handler)
@@ -18,5 +18,5 @@ class Event(object):
     def __isub__(self, handler):
         self.remove(handler)
 
-    def __call__(self, sender, event_args=None):
-        self.emit(sender, event_args)
+    def __call__(self, sender, args):
+        self.emit(sender, args)

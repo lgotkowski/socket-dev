@@ -6,6 +6,11 @@ class MessageTags(object):
     STOP = "stop"
 
 
+class MessageKeys(object):
+    CONTENT = "content"
+    TAG = "tag"
+
+
 class MessageHandler(object):
     def __init__(self):
         self._message_buffer = b""
@@ -17,7 +22,7 @@ class MessageHandler(object):
 
     @staticmethod
     def pack_message(content, message_tag=None):
-        content_dict = {"content": content, "message_tag": message_tag}
+        content_dict = {MessageKeys.CONTENT: content, MessageKeys.TAG: message_tag}
         content_bytes = MessageHandler.json_encode(content_dict)
 
         header = {"content_length": len(content_bytes)}
