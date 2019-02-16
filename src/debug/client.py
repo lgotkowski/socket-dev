@@ -1,8 +1,8 @@
 import socket
 import threading
 import time
-from message import MessageHandler
-from event import Event
+from debug.message import MessageHandler
+from debug.event import Event
 
 
 class ClientStates():

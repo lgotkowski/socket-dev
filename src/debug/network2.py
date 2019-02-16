@@ -1,9 +1,7 @@
 import socket
-import json
-import struct
 import threading
-from event import Event
-from network import NetMessageHandler, NetMessageTags, NetMessageKeys
+from debug.event import Event
+from debug.network import NetMessageHandler, NetMessageTags, NetMessageKeys
 
 
 class ClientStates(object):

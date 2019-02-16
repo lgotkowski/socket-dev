@@ -2,7 +2,7 @@ import socket
 import json
 import struct
 import threading
-from event import Event
+from debug.event import Event
 
 
 class NetMessageTags(object):

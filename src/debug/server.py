@@ -1,7 +1,7 @@
 import socket
 import threading
-from message import MessageHandler, MessageTags
-from event import Event
+from debug.message import MessageHandler, MessageTags
+from debug.event import Event
 
 
 class Server(object):
