@@ -10,20 +10,25 @@ class Requests(object):
 
 
 class Server(object):
-    def __init__(self, ip, port):
+    def __init__(self):
         super(Server, self).__init__()
-        self._counter = 0
+
+    def start(self, ip, port):
         self._ip = ip
         self._port = port
-        self._close_request = False
-        self._thread = threading.Thread(target=self._start)
 
-    def start(self):
         print("Server Started.")
+        self._thread = threading.Thread(target=self._start)
+        self._close_request = False
+        self._timeout_count = 0
         self._thread.start()
 
     def close(self):
         self._close_request = True
+
+    def restart(self):
+        self.close()
+        self.start(self._ip, self._port)
 
     def _start(self):
         if self._close_request:
@@ -31,6 +36,7 @@ class Server(object):
             return
 
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
+            server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             server_socket.bind((self._ip, self._port))
             server_socket.settimeout(2)
             server_socket.listen(1)
@@ -42,9 +48,15 @@ class Server(object):
                     self._listen(connection, stream_handler)
                     #self.send(connection)
             except socket.timeout:
-                pass
+                self._timeout_count += 1
+                if self._timeout_count % 10 == 0:
+                    pass
+                print("time out count: {}".format(self._timeout_count))
 
-        self._start()
+        if self._timeout_count > 980:
+            self.restart()
+        else:
+            self._start()
 
     def _listen(self, connection, stream_handler):
         connection.settimeout(1)
@@ -63,7 +75,6 @@ class Server(object):
     def send(self, connection, data):
         stream = StreamHandler.data_to_stream(data)
         connection.send(stream)
-        self._counter += 1
 
     def _process_request(self, connection, data):
         request_id = data.get("id")
