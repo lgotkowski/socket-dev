@@ -49,9 +49,8 @@ class Server(object):
                     #self.send(connection)
             except socket.timeout:
                 self._timeout_count += 1
-                if self._timeout_count % 10 == 0:
-                    pass
-                print("time out count: {}".format(self._timeout_count))
+                if self._timeout_count % 20 == 0:
+                    print("time out count: {}".format(self._timeout_count))
 
         if self._timeout_count > 980:
             self.restart()
