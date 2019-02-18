@@ -10,7 +10,7 @@ emotions = ["happy", "angry", "sad"]
 
 directions = ["up", "down", "left", "ight"]
 
-speed = ["fast", "slow", "normal"]r
+speed = ["fast", "slow", "normal"]
 
 locations = ["onto", "under", "next to"]
 

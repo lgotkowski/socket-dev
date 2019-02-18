@@ -12,13 +12,18 @@ def get_resource_dir():
     return Path(res_path)
 
 
+def get_nltk_data_path():
+    nltk_data_path = os.path.join(os.getenv("APPDATA"), "nltk_data")
+    return Path(nltk_data_path)
+
+
 def default_pos_tag(text):
     text_tokenized = word_tokenize(text)
     return nltk.pos_tag(text_tokenized)
 
 
 def _setup_java_home(java_path=None):
-    os.environ['JAVAHOME'] = java_path or "C:/Program Files/Java/jdk1.8.0_201/bin/java.exe"
+    os.environ['JAVAHOME'] = java_path or "C:/Program Files/Java/jdk-11.0.1/bin/java.exe"
 
 
 def stanford_pos_tag(text, java_path=None):
