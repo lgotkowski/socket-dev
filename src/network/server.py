@@ -4,7 +4,7 @@ import struct
 import socket
 import language.analyse
 import pkg_resources
-import os
+from utils import utils
 
 
 class Requests(object):
@@ -17,17 +17,10 @@ class Server(object):
 
     @staticmethod
     def from_configurationn():
-        pkg = "network"
-        file_path = pkg_resources.resource_filename(pkg, "config/connection.json")
-
-        with open(file_path, "r") as in_file:
-            in_data = json.load(in_file)
-
-        ip = in_data.get("ip")
-        port = in_data.get("port")
-        print(ip, port)
+        ip = utils.get_from_config("ip")
+        port = utils.get_from_config("port")
         server = Server()
-        server.start(in_data.get("ip"), in_data.get("port"))
+        server.start(ip, port)
         return server
 
     def start(self, ip, port):
