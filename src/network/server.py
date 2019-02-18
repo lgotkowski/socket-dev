@@ -2,7 +2,7 @@ import threading
 import json
 import struct
 import socket
-from language.analiyse import TextAnalyser
+import language.analyse
 
 
 class Requests(object):
@@ -82,7 +82,7 @@ class Server(object):
         print("ID: {} | Request: {} | Args: {}".format(request_id, request, args))
 
         if request == Requests.ACTIONS_FROM_TEXT:
-            result = TextAnalyser.actions_from_text(args)
+            result = language.analyse.actions_from_text(args)
             data = {"id": request_id, "result": result}
             self.send(connection, data=data)
 
@@ -135,3 +135,4 @@ class StreamHandler(object):
             self._data_list.append(data)
 
         return self._data_list
+

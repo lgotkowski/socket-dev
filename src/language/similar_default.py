@@ -39,7 +39,9 @@ sentences = ["Happy Fussel, find the big blue tree and take it",
 
 
 for sentence in sentences:
+    print("Start scentence...")
     text_tagged = utils.stanford_pos_tag(sentence)
+    print("text_tagged: {}".format(text_tagged))
 
     grammar = """
                 Adv: {<RB>}
@@ -69,7 +71,6 @@ for sentence in sentences:
 
 
     cp = nltk.RegexpParser(grammar)
-
 
     grammar_result = cp.parse(text_tagged)
 
