@@ -26,6 +26,5 @@ preview/
 doc/_build/
 \.idea/
 *.egg*
-**/debug.py
-/venv
+venv
 src/language/res
