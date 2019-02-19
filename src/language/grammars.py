@@ -47,4 +47,21 @@ gramar2 = """
         ActRel: {<ActDesc><Rel>*<ObjDescList><Seq><ActPrep><Desc>*<Rel>*<Prep>* | <ActDesc><Rel>*<ObjDescList><Seq><ActPrep><ObjDescList>* | <ActDesc|ActPrep><Rel>*<ObjDescList><Desc>* | <ActPrep><Desc>*}
         """
 
-gramar3 = """"""
+gramar3 = """
+Char: {<CHAR>}
+Adv: {<RB>}
+Adj: {<J.*>}
+Object: {<N.*>}
+Action: {<V.*>}
+Direction: {<RP>}
+Prep: {<PRP.*>}
+Desc: {<Adv|Adj>+}
+Seq: {<CC|,>}
+Rel: {<IN|TO>}
+Mod: {<MD>}
+
+CharDesc: {<DT>*<Desc>*<Char><Rel>*}
+ActDesc: {<Rel>*<Prep>*<Desc>*<Action><Desc>*<Prep>*<Rel>*}
+ObjDesc: {<DT>*<Desc>*<Object>}
+
+"""

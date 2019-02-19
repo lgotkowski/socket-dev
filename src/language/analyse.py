@@ -20,23 +20,31 @@ class TextAnalyser(object):
 
     def actions_from_text(self, text, grammar=None):
         print("Speech: {}".format(text))
-        text = text.lower()
+
         grammar_tree = self._build_grammar_tree(text, grammar)
         self._actions_from_grammar_tree(grammar_tree)
 
         grammar_tree.draw()
         return "Server: ({})".format(text)
 
-    def _build_grammar_tree(self, text, grammar=None):
+    def _tag_text(self, text):
+        text = text.lower()
         text_tagged = languageutils.stanford_pos_tag(text)
-        print("TaggedText: {}".format(text_tagged))
-        # Fix tag for 'there'
+
+        # Fix tag for '
         for i in range(len(text_tagged)):
             word, tag = text_tagged[i]
             if word == "there":
                 text_tagged[i] = (word, "PRP")
             if word in self._characters:
                 text_tagged[i] = (word, "CHAR")
+            if word == "please":
+                text_tagged[i] = (word, "UH")
+        return text_tagged
+
+    def _build_grammar_tree(self, text, grammar=None):
+        text_tagged = self._tag_text(text)
+        print("Tags: {}".format(text_tagged))
 
         cp = nltk.RegexpParser(grammar or grammars.gramar1)
         grammar_tree = cp.parse(text_tagged)
