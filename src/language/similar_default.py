@@ -1,5 +1,5 @@
 import nltk
-from language import utils
+from language import languageutils
 
 actions = {"walk": ["walk", "go", "run", "move"],
            "grab": ["grab", "take", "pickup", "drag", "bring"],
@@ -40,7 +40,7 @@ sentences = ["Happy Fussel, find the big blue tree and take it",
 
 for sentence in sentences:
     print("Start scentence...")
-    text_tagged = utils.stanford_pos_tag(sentence)
+    text_tagged = languageutils.stanford_pos_tag(sentence)
     print("text_tagged: {}".format(text_tagged))
 
     grammar = """
