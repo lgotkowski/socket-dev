@@ -14,6 +14,7 @@ class Requests(object):
 class Server(object):
     def __init__(self):
         super(Server, self).__init__()
+        self._text_analyser = language.analyse.TextAnalyser()
 
     @staticmethod
     def from_configurationn():
@@ -92,7 +93,7 @@ class Server(object):
         print("ID: {} | Request: {} | Args: {}".format(request_id, request, args))
 
         if request == Requests.ACTIONS_FROM_TEXT:
-            result = language.analyse.actions_from_text(args)
+            result = self._text_analyser.actions_from_text(args)
             data = {"id": request_id, "result": result}
             self.send(connection, data=data)
 

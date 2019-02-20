@@ -1,8 +1,6 @@
 from language import analyse
 from language import grammars
 
-text_analyser = analyse.TextAnalyser()
-
 
 s = ["Fussel bring me the banana",
      "Bring me the banana Fussel",
@@ -13,11 +11,15 @@ s = ["Fussel bring me the banana",
      "Fussel Bring me the biggest yellow banana",
      "Can you please bring me the biggest yellow banana fussel",
      "Fussel go to the table and bring me the yellow banana",
-     "Go to the table fussel and bring me the yellow banana",
+     "Go to the table fussel and bring me the yellow banana and the apple",
+     "Go to the table and bring the banana to me",
+     "Go to the table and bring the yellow banana to me",
+     "Go to the banana and bring it to me",
      "Can you go to the table and bring me the yellow banana fussel",
-     "Can you please got to the table and bring me the yellow banana fussel",
+     "Can you please go to the table and bring me the yellow banana fussel",
      "Fussel can you please go to the table and bring me the yellow banana",
      "Bring me the yellow banana from the table fussel",
+     "Fussel go to the table and bring me the yellow banana from there",
      "Take the yellow banana from the table and bring it to me fussel",
      "Fussel take the yellow banana from the table and bring it to me",
      "Fussel go to the table and bring me the yellow banana from there",
@@ -26,31 +28,8 @@ s = ["Fussel bring me the banana",
      "From the table bring me the yellow banana fussel"]
 
 # ADD would, could
+text_analyser = analyse.TextAnalyser()
 
 for text in s:
-     text_tagged = text_analyser._tag_text(text)
+    text_analyser.actions_from_text(text, grammars.grammar4, draw_tree=True)
 
-     grammar_tree = text_analyser._build_grammar_tree(text, grammar=grammars.gramar3)
-
-     tags = [("RB", "Adv"),
-             ("J", "Adj"),
-             ("N", "Object"),
-             ("V", "Action"),
-             ("RP", "Direction"),
-             ("PRP", "Prep"),
-             ("Adv", "Desc"),
-             ("Adj", "Desc"),
-             ("CC", "Seq"),
-             (",", "Seq"),
-             ("IN", "Rel"),
-             ("TO", "Rel")]
-
-     for i in range(len(text_tagged)):
-          word, tag = text_tagged[i]
-          for t in tags:
-               if tag.startswith(t[0]):
-                    text_tagged[i] = (word, t[1])
-
-
-     print(text_tagged)
-     grammar_tree.draw()

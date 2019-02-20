@@ -8,7 +8,7 @@ class Event(object):
     def remove(self, handler):
         self._handlers.remove(handler)
 
-    def emit(self, sender, args):
+    def emit(self, sender, args=None):
         for handler in self._handlers:
             handler(sender, args)
 
