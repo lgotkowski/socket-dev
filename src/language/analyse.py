@@ -1,4 +1,5 @@
 from language import languageutils
+from utils import utils
 import nltk
 from language import grammars
 from network.event import Event
@@ -13,20 +14,22 @@ class TextAnalyser(object):
 
         self._items = items or ["tree", "apple", "door", "window", "chair", "table"]
 
-        self._actions = actions or [{"name": "walk", "args": ["actors", "destination", "distance"]},
-                                    {"name": "bring", "args": ["actors", "items", "destination"]},
+        self._actions = actions or [
+                                    {"name": "walk", "args": ["actors", "directions"]},
+                                    {"name": "bring", "args": ["actors", "items", "directions=me"]},
                                     {"name": "take", "args": ["actors", "items"]},
-                                    {"name": "climb", "args": ["actors", "direction", "distance", "destination"]},
+                                    {"name": "switch", "args": ["actors", "items", "direction"]},
+                                    {"name": "climb", "args": ["actors", "items", "direction=up"]},
                                     {"name": "smile", "args": ["actors"]},
                                     {"name": "wave", "args": ["actors"]},
-                                    {"name": "be", "args": ["actors", "mood"]}]
+                                    {"name": "be", "args": ["actors", "mood"]},
+                                    {"name": "stop", "args": ["actors", "action_name=None"]}
+                                    ]
 
         self._extra_func = extra_func or [{"name": "biggest", "args": ["item"]},
                                           {"name": "smallest", "args": ["item"]},
                                           {"name": "closest", "args": ["item"]},
                                           {"name": "farthest", "args": ["item"]}]
-
-        self._threads = []
 
     @property
     def actions(self):
@@ -40,34 +43,22 @@ class TextAnalyser(object):
     def items(self):
         return self._items
 
-    def add_thread(self, thread):
-        self._threads.append(thread)
-
-    def actions_from_text(self, text, grammar=None, draw_tree=False, threaded=False):
-        if threaded:
-            thread = threading.Thread(target=self.actions_from_text, args=(text, grammar, draw_tree))
-            self.add_thread(thread)
-            thread.start()
-        else:
-            return self._actions_from_text(text, grammar, draw_tree)
-
-    def _actions_from_text(self, text, grammar=None, draw_tree=False):
+    def actions_from_text(self, text, grammar=None, draw_tree=False):
         print("Input Client: {}".format(text))
         grammar_tree = self._build_grammar_tree(text, grammar)
-        self._actions_from_grammar_tree(grammar_tree)
+        action_with_args = self._actions_from_grammar_tree(grammar_tree)
 
         if draw_tree:
             grammar_tree.draw()
         self.on_analyse_finished.emit(sender=self)
-        print("Output Server: ({})".format(text))
-        return "Output Server: ({})".format(text)
+        return action_with_args
 
     def _build_grammar_tree(self, text, grammar):
         text_tagged = self._tag_text(text)
-        print("Tags: {}".format(text_tagged))
 
         cp = nltk.RegexpParser(grammar or grammars.grammar3)
         grammar_tree = cp.parse(text_tagged)
+
         return grammar_tree
 
     def _tag_text(self, text):
@@ -85,27 +76,6 @@ class TextAnalyser(object):
                 text_tagged[i] = (word, "UH")
 
         return text_tagged
-
-    def _actions_from_grammar_tree(self, grammar_tree):
-        grammar_data = self._tree_to_list_tuple(grammar_tree)
-        print("Grammar Data: {}".format(grammar_data))
-
-        characters = []
-        actions = []
-        items = []
-
-        labels = ["Action", "Char", "Item", "ActDesc", "CharDesc", "ItemDesc"]
-        for label in labels:
-            content = self._extract_label(target_label=label, list_tuple=grammar_data)
-            print("{}: {}".format(label, content))
-
-        act_desc_list = self._extract_label(target_label="ActDesc", list_tuple=grammar_data)
-        for act_desc in act_desc_list:
-            action = self._extract_label(target_label="Action", list_tuple=act_desc)
-            print("Action: {} | Desc: {}".format(action, act_desc))
-
-
-        print("")
 
     def _tree_to_list_tuple(self, tree):
         tree_data = []
@@ -131,24 +101,149 @@ class TextAnalyser(object):
                 tdict[t.label()] = t[0]
         return tdict
 
-    def _extract_label(self, target_label, list_tuple, output_list=None):
+    def _extract_label(self, target_labels, list_tuple, output_list=None, deep=True):
+
         if output_list is None:
             output_list = []
 
-        for i in range(len(list_tuple)):
-            element = list_tuple[i]
+        for target_label in target_labels:
+            for i in range(len(list_tuple)):
+                element = list_tuple[i]
 
-            if isinstance(element, tuple):
-                label = element[0]
-                content = element[1]
-                #print("Label: '{}'".format(label))
-                if target_label == label:
-                    output_list.append(content)
-                elif isinstance(content, list):
-                    self._extract_label(target_label=target_label, list_tuple=content,
+                if isinstance(element, tuple):
+                    label = element[0]
+                    content = element[1]
+                    #print("Label: '{}'".format(label))
+                    if target_label == label:
+                        output_list.append(content)
+                    elif isinstance(content, list) and deep:
+                        self._extract_label(target_labels=[target_label], list_tuple=content,
+                                            output_list=output_list)
+                elif isinstance(element, list) and deep:
+                    content = element[1]
+                    self._extract_label(target_labels=[target_label], list_tuple=content,
                                         output_list=output_list)
-            elif isinstance(element, list):
-                content = element[1]
-                self._extract_label(target_label=target_label, list_tuple=content,
-                                    output_list=output_list)
         return output_list
+
+    ######################
+
+    def _get_item(self, item_data):
+        data = {}
+        for branch in item_data:
+            if branch.label() == "ItemType":
+                data["name"] = branch.leaves()[0][0]
+            elif branch.label() == "Attr":
+                data["attr"] = branch.leaves()[0][0]
+        print("Char: {}".format(data))
+        return data
+
+    def _get_char(self, char_data):
+        #print("Char: {}".format(char_data))
+        data = {}
+        for branch in char_data:
+            if branch.label() == "CharName":
+                data["name"] = branch.leaves()[0][0]
+            elif branch.label() == "Attr":
+                data["attr"] = branch.leaves()[0][0]
+        print("Char: {}".format(data))
+        return data
+
+    def _get_action(self, action_data):
+        data = {}
+        for branch in action_data:
+            if branch.label() == "ActionType":
+                data["name"] = branch.leaves()[0][0]
+            elif branch.label() == "Attr":
+                data["attr"] = branch.leaves()[0][0]
+        print("Action: {}".format(data))
+        return data
+
+    def _get_direction(self, direction_data):
+        data = {}
+        for branch in direction_data:
+            if branch.label() == "Item":
+                for child in branch:
+                    if child.label() == "ItemType":
+                        data["name"] = child.leaves()[0][0]
+                    elif child.label() == "Attr":
+                        data["attr"] = child.leaves()[0][0]
+
+            elif branch.label() == "Char":
+                for child in branch:
+                    if child.label() == "CharName":
+                        data["name"] = child.leaves()[0][0]
+                    elif child.label() == "Attr":
+                        data["attr"] = child.leaves()[0][0]
+
+            elif branch.label() == "Pointer":
+                data["name"] = branch.leaves()[0][0]
+        print("Direction: {}".format(data))
+        return data
+
+    def _get_item_loc(self, locationSrc_data):
+        data = {}
+        for branch in locationSrc_data:
+            if branch.label() == "Item":
+                for child in branch:
+                    if child.label() == "ItemType":
+                        data["name"] = child.leaves()[0][0]
+                    elif child.label() == "Attr":
+                        data["attr"] = child.leaves()[0][0]
+
+            elif branch.label() == "Char":
+                for child in branch:
+                    if child.label() == "CharName":
+                        data["name"] = child.leaves()[0][0]
+                    elif child.label() == "Attr":
+                        data["attr"] = child.leaves()[0][0]
+
+            elif branch.label() == "Pointer":
+                data["name"] = branch.leaves()[0][0]
+        print("Direction: {}".format(data))
+        return data
+
+    def _actions_from_grammar_tree(self, grammar_tree):
+        chars = []
+        items = []
+        direction = {}
+        action = {}
+        locSrc = None
+
+        for branch in grammar_tree:
+            branch = branch
+            if not isinstance(branch, nltk.tree.Tree):
+                continue
+            #print("Branch: {}".format(branch.label()))
+            label = branch.label()
+
+            if label == "Chars":
+                for child in branch:
+                    if not isinstance(child, nltk.tree.Tree) or child.label() != "Char":
+                        continue
+                    chars.append(self._get_char(child))
+            elif label == "Char":
+                chars.append(self._get_char(branch))
+
+            elif label == "Action":
+                action = self._get_action(branch)
+
+            elif label == "Items":
+                for child in branch:
+                    if not isinstance(child, nltk.tree.Tree) or child.label() != "Item":
+                        continue
+                    items.append(self._get_item(child))
+
+            elif label == "Item":
+                items.append(self._get_item(branch))
+
+            elif label == "Direction":
+                direction = self._get_direction(branch)
+
+            elif label == "LocationSrc":
+                locSrc = self._get_item_loc(branch)
+
+        items = {"items": items, "location": locSrc}
+
+        data = {"action": action, "args": {"actors": chars, "direction": direction, "items": items}}
+        print(data)
+

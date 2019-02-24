@@ -19,6 +19,22 @@ def get_from_resource(resource):
     return Path(pkg_resources.resource_filename(pkg, file_path))
 
 
+def get_example_text(example="sentences.txt"):
+    text_file = get_from_resource(example)
+    with open(str(text_file)) as f:
+        text = f.readlines()
+    #content = [x.strip() for x in content]
+
+
+    content = []
+    for raw_line in text:
+        line = raw_line.strip()
+        if line != "" and not line.startswith("#"):
+            content.append(line)
+    print(content)
+    return content
+
+
 def get_nltk_data_path():
     nltk_data_path = os.path.join(os.getenv("APPDATA"), "nltk_data")
     return Path(nltk_data_path)
