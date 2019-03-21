@@ -1,7 +1,7 @@
 import pkg_resources
 import json
 import io
-from PIL import Image
+
 
 
 def get_from_config(key):
@@ -12,8 +12,9 @@ def get_from_config(key):
 
     return settings.get(key)
 
-
+"""
 def save_as_jpg(tree):
+    from PIL import Image
     from nltk.draw.tree import tree_to_treesegment
     from nltk.draw.util import CanvasFrame
     from nltk.internals import find_binary
@@ -52,3 +53,4 @@ def save_as_jpg(tree):
     im = Image.open(io.BytesIO(ps.encode('utf-8')))
     im = im.resize((w *3, h*3), Image.ANTIALIAS)
     im.save("test" + '.png', quality=100)
+"""
