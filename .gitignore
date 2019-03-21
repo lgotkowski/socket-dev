@@ -1,5 +1,5 @@
 *.idea
 *.pyc
 venv
-src/language/res
+src/language/res/stanford-postagger-full-2018-10-16
 scr/utils/config

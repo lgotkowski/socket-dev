@@ -1,0 +1,41 @@
+# bring action
+Fussel bring the blue banana to me
+bring the blue banana to me Fussel
+Fussel bring me justin's blue banana
+bring me justin's blue banana Fussel
+Fussel bring justin's blue banana to me
+bring justin's blue banana to me Fussel
+
+# take action
+Fussel take the banana
+take the banana Fussel
+Fussel take my banana
+take my banana fussel
+fussel take my banana from the table
+take my banana from the table fussel
+from my table take the banana fussel
+fussel from my table take the banana
+
+# turn off action
+Fussel turn off the light
+turn off the light Fussel
+fussel turn the light off
+turn the light off fussel
+
+# turn on action
+Fussel turn on the light
+turn on the light Fussel
+fussel turn the light on
+turn the light on fussel
+
+# walk action
+fussel walk to the chair
+walk to the chair fussel
+fussel walk to my chair
+walk to my chair fussel
+
+# take action
+fussel take the blue banana from my table
+take the blue banana from my table fussel
+fussel from my table take the blue banana
+from my table take the blue banana fussel
