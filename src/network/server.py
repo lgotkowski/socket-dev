@@ -95,6 +95,7 @@ class Server(object):
         if request == Requests.ACTIONS_FROM_TEXT:
             result = self._text_analyser.actions_from_text(args)
             data = {"id": request_id, "result": result}
+            print("Sending Back: {}".format(data))
             self.send(connection, data=data)
 
 

@@ -2,10 +2,6 @@ from language import analyse
 from language import grammars
 from language import languageutils
 
-s = [
-     ""
-]
-
 
 # ADD would, could
 text_analyser = analyse.TextAnalyser()

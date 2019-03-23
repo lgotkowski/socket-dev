@@ -56,7 +56,7 @@ class TextAnalyser(object):
     def _build_grammar_tree(self, text, grammar):
         text_tagged = self._tag_text(text)
 
-        cp = nltk.RegexpParser(grammar or grammars.grammar3)
+        cp = nltk.RegexpParser(grammar or grammars.grammar7)
         grammar_tree = cp.parse(text_tagged)
 
         return grammar_tree
@@ -180,7 +180,7 @@ class TextAnalyser(object):
         print("Direction: {}".format(data))
         return data
 
-    def _get_item_loc(self, locationSrc_data):
+    def _get_item_src(self, locationSrc_data):
         data = {}
         for branch in locationSrc_data:
             if branch.label() == "Item":
@@ -207,7 +207,7 @@ class TextAnalyser(object):
         items = []
         direction = {}
         action = {}
-        locSrc = None
+        source = None
 
         for branch in grammar_tree:
             branch = branch
@@ -240,10 +240,11 @@ class TextAnalyser(object):
                 direction = self._get_direction(branch)
 
             elif label == "LocationSrc":
-                locSrc = self._get_item_loc(branch)
+                source = self._get_item_src(branch)
 
-        items = {"items": items, "location": locSrc}
+        #items = {"items": items, "location": locSrc}
 
-        data = {"action": action, "args": {"actors": chars, "direction": direction, "items": items}}
-        print(data)
+        data = {"action": action, "actors": chars, "direction": direction, "items": items, "source": source}
+        print("Actions from text: {}".format(data))
+        return data
 

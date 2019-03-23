@@ -46,7 +46,7 @@ def default_pos_tag(text):
 
 
 def _setup_java_home(java_path=None):
-    os.environ['JAVAHOME'] = java_path or  utils.get_from_config("javahome") # "C:/Program Files/Java/jdk-11.0.2/bin/java.exe"
+    os.environ['JAVAHOME'] = java_path or utils.get_from_config("javahome") # "C:/Program Files/Java/jdk-11.0.2/bin/java.exe"
 
 
 def stanford_pos_tag(text, java_path=None):
